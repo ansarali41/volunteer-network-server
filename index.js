@@ -1,10 +1,17 @@
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
-const pass ='i96NsKUrgnqWp6xA volunteerNetworkUser';
+const objectId = require('mongodb').ObjectID;
+require('dotenv').config()
+
+const username = process.env.DB_USER;
+const password = process.env.DB_PASS;
+const databaseName = process.env.DB_NAME;
+
+
 const MongoClient = require('mongodb').MongoClient;
-const uri = "mongodb+srv://volunteerNetworkUser:i96NsKUrgnqWp6xA@cluster0.yf6o8.mongodb.net/volunteerNetwork?retryWrites=true&w=majority";
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true  });
+const uri = `mongodb+srv://${username}:${password}@cluster0.yf6o8.mongodb.net/${databaseName}?retryWrites=true&w=majority`;
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const app = express()
 app.use(cors());
@@ -15,48 +22,61 @@ app.get('/', (req, res) => {
     res.send('Hello World!')
 })
 
-// mongodb
 
+// mongodb
 client.connect(err => {
-  const volunteerTasksCollection = client.db("volunteerNetwork").collection("volunteerTasks");
-//   create or post to database
+    const volunteerTasksCollection = client.db("volunteerNetwork").collection("volunteerTasks");
+    const registrationListCollection = client.db("volunteerNetwork").collection("registrationList");
+
+    //   create or post to database
     app.post("/addVolunteerTasks", (req, res) => {
         const volunteerTasks = req.body;
         console.log(err, volunteerTasks);
         volunteerTasksCollection.insertMany(volunteerTasks)
-        .then(result => {
-            console.log(result);
-        })
+            .then(result => {
+                console.log(result);
+            })
     })
-    // get or read data from database
+
+    // get or read data all data from database
     app.get('/volunteerTasks', (req, res) => {
         volunteerTasksCollection.find({})
-        .toArray((err, documents) => {
+            .toArray((err, documents) => {
+                res.send(documents)
+            })
+    })
+
+    // registration post to database
+    app.post('/addRegistration', (req, res) => {
+        const registration = req.body;
+        registrationListCollection.insertOne(registration)
+            .then(result => {
+                res.send(result.insertedCount > 0)
+            })
+    })
+
+    // get registration list of user 
+    app.get('/registrations/:email', (req, res) => {
+        const userEmail =req.params.email;
+        registrationListCollection.find({email: userEmail})
+        .toArray((err,documents) => {
             res.send(documents)
         })
+    })
+    // delete task from database
+    app.delete('/delete/:id', (req, res) => {
+        const id = req.params.id
+        console.log(id);
+        registrationListCollection.deleteOne({_id: objectId(req.params.id)})
+        .then((result) => {
+            res.send(result.deletedCount>0)
+        })
+      
     })
 
     console.log('database connected');
 
 });
-
-
-// client.connect(err => {
-//     const volunteerTasksCollection = client.db("volunteerNetwork").collection("volunteerTasks");
-//     // create or post to database
-//     app.post("/addVolunteerTasks", (req, res) => {
-//         const volunteerTasks = req.body;
-//         console.log(err, volunteerTasks);
-//         volunteerTasksCollection.insertOne(volunteerTasks)
-//         .then(result => {
-//             console.log(result);
-//         })
-//     })
-
-
-//     console.log('database connected');
-//     client.close();
-// });
 
 
 const port = 5000;
