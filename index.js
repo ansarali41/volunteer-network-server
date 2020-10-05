@@ -13,7 +13,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // root 
-app.get('/',(req, res) => {
+app.get('/', (req, res) => {
     res.send('database working')
 })
 
@@ -27,7 +27,7 @@ client.connect(err => {
         const volunteerTasks = req.body;
         volunteerTasksCollection.insertOne(volunteerTasks)
             .then(result => {
-                res.send(result.insertedCount>0)
+                res.send(result.insertedCount > 0)
             })
     })
 
@@ -50,42 +50,40 @@ client.connect(err => {
 
     // get registration list of user 
     app.get('/registrations/:email', (req, res) => {
-        const userEmail =req.params.email;
-        registrationListCollection.find({email: userEmail})
-        .toArray((err,documents) => {
-            res.send(documents)
-        })
+        const userEmail = req.params.email;
+        registrationListCollection.find({ email: userEmail })
+            .toArray((err, documents) => {
+                res.send(documents)
+            })
     })
 
     // delete task from database
     app.delete('/delete/:id', (req, res) => {
         const id = req.params.id;
-        registrationListCollection.deleteOne({_id: objectId(req.params.id)})
-        .then((result) => {
-            res.send(result.deletedCount>0)
-        })
+        registrationListCollection.deleteOne({ _id: objectId(req.params.id) })
+            .then((result) => {
+                res.send(result.deletedCount > 0)
+            })
     })
 
     // read all user data from data (admin)
     app.get('/allRegistrations', (req, res) => {
         registrationListCollection.find({})
-        .toArray((err, documents) => {
-            res.send(documents);
-        })
+            .toArray((err, documents) => {
+                res.send(documents);
+            })
     })
 
     // delete user registration from admin 
     app.delete('/deleteUserReg/:id', (req, res) => {
         const id = req.params.id;
-        registrationListCollection.deleteOne({_id: objectId(req.params.id)})
-        .then((result) => {
-            res.send(result.deletedCount>0)
-        })
+        registrationListCollection.deleteOne({ _id: objectId(req.params.id) })
+            .then((result) => {
+                res.send(result.deletedCount > 0)
+            })
     })
 });
 
 
 const port = 5000;
-app.listen(port, () => {
-    console.log( process.env.PORT ||port)
-})
+app.listen(process.env.PORT || port)
