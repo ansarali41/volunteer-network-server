@@ -28,13 +28,12 @@ client.connect(err => {
     const volunteerTasksCollection = client.db("volunteerNetwork").collection("volunteerTasks");
     const registrationListCollection = client.db("volunteerNetwork").collection("registrationList");
 
-    //   create or post to database
+    //   create or post to database from admin
     app.post("/addVolunteerTasks", (req, res) => {
         const volunteerTasks = req.body;
-        console.log(err, volunteerTasks);
-        volunteerTasksCollection.insertMany(volunteerTasks)
+        volunteerTasksCollection.insertOne(volunteerTasks)
             .then(result => {
-                console.log(result);
+                res.send(result.insertedCount>0)
             })
     })
 
@@ -63,15 +62,31 @@ client.connect(err => {
             res.send(documents)
         })
     })
+
     // delete task from database
     app.delete('/delete/:id', (req, res) => {
-        const id = req.params.id
-        console.log(id);
+        const id = req.params.id;
         registrationListCollection.deleteOne({_id: objectId(req.params.id)})
         .then((result) => {
             res.send(result.deletedCount>0)
         })
-      
+    })
+
+    // read all user data from data (admin)
+    app.get('/allRegistrations', (req, res) => {
+        registrationListCollection.find({})
+        .toArray((err, documents) => {
+            res.send(documents);
+        })
+    })
+
+    // delete user registration from admin 
+    app.delete('/deleteUserReg/:id', (req, res) => {
+        const id = req.params.id;
+        registrationListCollection.deleteOne({_id: objectId(req.params.id)})
+        .then((result) => {
+            res.send(result.deletedCount>0)
+        })
     })
 
     console.log('database connected');
