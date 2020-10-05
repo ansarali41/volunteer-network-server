@@ -8,7 +8,6 @@ const username = process.env.DB_USER;
 const password = process.env.DB_PASS;
 const databaseName = process.env.DB_NAME;
 
-
 const MongoClient = require('mongodb').MongoClient;
 const uri = `mongodb+srv://${username}:${password}@cluster0.yf6o8.mongodb.net/${databaseName}?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -16,12 +15,6 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 const app = express()
 app.use(cors());
 app.use(bodyParser.json());
-
-
-app.get('/', (req, res) => {
-    res.send('Hello World!')
-})
-
 
 // mongodb
 client.connect(err => {
@@ -88,13 +81,10 @@ client.connect(err => {
             res.send(result.deletedCount>0)
         })
     })
-
-    console.log('database connected');
-
 });
 
 
 const port = 5000;
 app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`)
+    console.log( process.env.PORT ||port)
 })
