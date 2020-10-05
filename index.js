@@ -4,12 +4,8 @@ const bodyParser = require('body-parser')
 const objectId = require('mongodb').ObjectID;
 require('dotenv').config()
 
-const username = process.env.DB_USER;
-const password = process.env.DB_PASS;
-const databaseName = process.env.DB_NAME;
-
 const MongoClient = require('mongodb').MongoClient;
-const uri = `mongodb+srv://${username}:${password}@cluster0.yf6o8.mongodb.net/${databaseName}?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.yf6o8.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const app = express()
