@@ -12,6 +12,11 @@ const app = express()
 app.use(cors());
 app.use(bodyParser.json());
 
+// root 
+app.get('/',(req, res) => {
+    res.send('database working')
+})
+
 // mongodb
 client.connect(err => {
     const volunteerTasksCollection = client.db("volunteerNetwork").collection("volunteerTasks");
